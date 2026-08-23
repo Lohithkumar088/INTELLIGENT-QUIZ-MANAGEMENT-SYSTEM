@@ -1,0 +1,586 @@
+{% extends 'base.html' %} 
+{% block title %}Quiz Dashboard{% endblock %}
+{% block content %}
+<style>
+  :root {
+    --bg-1: #070817;
+    --bg-2: #0e1624;
+    --muted: #b9cbe0;
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --accent-start: #8b6cff;
+    --accent-end: #6aaeff;
+    --card-shadow: rgba(3, 6, 20, 0.62);
+    --hero-text: #d8d4ff;
+    --glass-elev: 0 20px 60px rgba(0, 0, 0, 0.55);
+  }
+
+  /* page container */
+  .page-wrap {
+    max-width: 1200px;
+    margin: 28px auto 100px;
+    padding: 0 20px;
+  }
+
+  /* HERO (match home) */
+  .hero-section {
+    border-radius: 16px;
+    padding: 26px 28px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.01)
+    );
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-elev);
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .hero-top-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    background: linear-gradient(
+      90deg,
+      rgba(139, 108, 255, 0.12),
+      rgba(106, 174, 255, 0.1)
+    );
+    box-shadow: 0 12px 34px rgba(108, 99, 255, 0.08);
+    margin: 0 auto 8px;
+    color: var(--hero-text);
+    font-size: 1.8rem;
+  }
+  .hero-title {
+    font-size: 2.1rem;
+    font-weight: 900;
+    color: var(--hero-text);
+    margin: 6px 0 4px;
+    text-shadow:
+      0 0 10px rgba(140, 110, 255, 0.12),
+      0 8px 28px rgba(140, 110, 255, 0.04);
+  }
+  .hero-sub {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.02rem;
+  }
+
+  /* small live badge */
+  .badge-live {
+    display: inline-block;
+    background: linear-gradient(
+      90deg,
+      rgba(106, 174, 255, 0.06),
+      rgba(139, 108, 255, 0.06)
+    );
+    color: var(--accent-start);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    margin-left: 6px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(139, 108, 255, 0.06);
+  }
+
+  /* score cards row */
+  .cards-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin: 20px 0;
+  }
+  @media (max-width: 920px) {
+    .cards-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .score-card {
+    border-radius: 16px;
+    padding: 22px;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.01),
+      rgba(255, 255, 255, 0.008)
+    );
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-elev);
+    transition:
+      transform 0.22s cubic-bezier(0.18, 0.9, 0.32, 1),
+      box-shadow 0.22s ease;
+  }
+  .score-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 40px 120px rgba(6, 10, 24, 0.78);
+    border-color: rgba(140, 110, 255, 0.08);
+  }
+
+  .score-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    background: linear-gradient(
+      90deg,
+      rgba(139, 108, 255, 0.12),
+      rgba(106, 174, 255, 0.08)
+    );
+    box-shadow: 0 12px 34px rgba(108, 99, 255, 0.06);
+    color: var(--hero-text);
+    font-size: 1.4rem;
+  }
+  .stat-title {
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    color: var(--hero-text);
+    font-size: 1.9rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+
+  /* charts panel (glass) */
+  .custom-card {
+    border-radius: 16px;
+    padding: 20px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.01),
+      rgba(255, 255, 255, 0.008)
+    );
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-elev);
+    transition:
+      transform 0.22s,
+      box-shadow 0.22s;
+  }
+  .custom-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 48px 140px rgba(6, 10, 24, 0.9);
+  }
+
+  /* charts grid */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 12px;
+  }
+  @media (max-width: 1100px) {
+    .charts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* performance + activity row */
+  .split-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  @media (max-width: 980px) {
+    .split-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .performance-card,
+  .activity-card {
+    border-radius: 14px;
+    padding: 18px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.01),
+      rgba(255, 255, 255, 0.004)
+    );
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-elev);
+    color: var(--hero-text);
+  }
+
+  /* perf items */
+  .perf-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.008),
+      rgba(255, 255, 255, 0.004)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    margin-bottom: 12px;
+    transition:
+      transform 0.18s,
+      box-shadow 0.18s;
+  }
+  .perf-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 44px rgba(6, 10, 24, 0.48);
+  }
+
+  /* icon circle */
+  .perf-icon {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(
+      135deg,
+      rgba(108, 99, 255, 0.12),
+      rgba(106, 174, 255, 0.08)
+    );
+    box-shadow: 0 8px 28px rgba(108, 99, 255, 0.06);
+    color: var(--hero-text);
+    font-size: 1.4rem;
+  }
+  .perf-title {
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .perf-value {
+    color: var(--hero-text);
+    font-weight: 900;
+    font-size: 1.06rem;
+  }
+
+  /* recent activity list */
+  .activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .activity-item {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.005),
+      rgba(255, 255, 255, 0.002)
+    );
+  }
+  .activity-left {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .activity-badge {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+    color: var(--hero-text);
+    background: linear-gradient(
+      90deg,
+      rgba(139, 108, 255, 0.12),
+      rgba(106, 174, 255, 0.08)
+    );
+    border: 1px solid rgba(139, 108, 255, 0.06);
+    font-size: 0.85rem;
+  }
+  .activity-text {
+    color: var(--muted);
+    font-size: 0.98rem;
+  }
+
+  /* small CTA button consistent with homepage */
+  .btn-pill {
+    padding: 10px 18px;
+    border-radius: 50px;
+    font-weight: 700;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+    color: #fff;
+    border: none;
+    box-shadow: 0 12px 30px rgba(108, 99, 255, 0.12);
+  }
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--muted);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* footer glow (subtle) */
+  .panel-glow {
+    margin-top: 12px;
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      rgba(139, 108, 255, 0.12),
+      rgba(106, 174, 255, 0.08)
+    );
+    filter: blur(18px);
+    opacity: 0.8;
+  }
+
+  /* responsive tweaks */
+  @media (max-width: 720px) {
+    .hero-title {
+      font-size: 1.6rem;
+    }
+    .cards-row {
+      grid-template-columns: 1fr;
+    }
+    .charts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="page-wrap">
+  <!-- HERO -->
+  <section class="hero-section" role="banner" aria-label="Performance summary">
+    <div class="hero-top-icon" aria-hidden="true">
+      <i class="bi bi-bar-chart-fill"></i>
+    </div>
+    <h1 class="hero-title">Quiz Performance Dashboard</h1>
+    <p class="hero-sub">
+      Get insights on your learning activity and progress
+      <span class="badge-live">Live</span>
+    </p>
+  </section>
+
+  <!-- SCORE CARDS -->
+  <div class="cards-row" role="region" aria-label="Key stats">
+    <div class="score-card">
+      <div class="score-icon"><i class="bi bi-kanban-fill"></i></div>
+      <div class="stat-title">Total Quizzes</div>
+      <div class="stat-value">{{ total_quizzes }}</div>
+    </div>
+
+    <div class="score-card">
+      <div class="score-icon"><i class="bi bi-star-fill"></i></div>
+      <div class="stat-title">Average Score</div>
+      <div class="stat-value">{{ avg_score|default:0 }}%</div>
+    </div>
+
+    <div class="score-card">
+      <div class="score-icon"><i class="bi bi-clock-history"></i></div>
+      <div class="stat-title">Total Time Spent</div>
+      <div class="stat-value">{{ total_time_str }}</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="custom-card">
+    <h3 style="margin: 0 0 12px; color: var(--hero-text); font-weight: 900">
+      <i class="bi bi-graph-up" style="margin-right: 8px"></i> Insights &
+      Analytics
+    </h3>
+
+    <div class="charts-grid">
+      <div style="padding: 8px">
+        <canvas id="pieCategories" height="220"></canvas>
+        <div style="text-align: center; color: var(--muted); margin-top: 8px">
+          Category Distribution
+        </div>
+      </div>
+
+      <div style="padding: 8px">
+        <canvas id="scoreLineChart" height="220"></canvas>
+        <div style="text-align: center; color: var(--muted); margin-top: 8px">
+          Score Progress (Weekly)
+        </div>
+      </div>
+
+      <div style="padding: 8px">
+        <canvas id="timeBarChart" height="220"></canvas>
+        <div style="text-align: center; color: var(--muted); margin-top: 8px">
+          Time Spent Analytics
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-glow" aria-hidden="true"></div>
+  </div>
+
+  <!-- PERFORMANCE + ACTIVITY ROW -->
+  <div class="split-row">
+    <div class="performance-card">
+      <h4 style="margin: 0 0 10px; color: var(--hero-text); font-weight: 900">
+        <i class="bi bi-flag-fill" style="margin-right: 6px"></i> Performance
+        Summary
+      </h4>
+
+      <div style="margin-top: 10px">
+        <!-- Best Performance -->
+        <div class="perf-item">
+          <div class="perf-icon"><i class="bi bi-trophy-fill"></i></div>
+          <div>
+            <div class="perf-title">Best Performance</div>
+            {% if best_attempt %}
+            <div class="perf-value" style="color: #8f85ff">
+              {{ best_attempt.category }} — {{ best_attempt.score_percentage }}%
+            </div>
+            {% else %}
+            <div class="perf-value" style="color: var(--muted)">
+              No data yet
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Needs Improvement -->
+        <div class="perf-item">
+          <div class="perf-icon">
+            <i class="bi bi-lightning-charge-fill"></i>
+          </div>
+          <div>
+            <div class="perf-title">Needs Improvement</div>
+            {% if needs_improve %}
+            <div class="perf-value" style="color: #ff7a7a">
+              {{ needs_improve.category }} — {{ needs_improve.score_percentage
+              }}%
+            </div>
+            {% else %}
+            <div class="perf-value" style="color: var(--muted)">
+              No data yet
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px">
+        <a href="{% url 'categories' %}" class="btn-pill btn-ghost"
+          >Browse Categories</a
+        >
+        <a
+          href="{% url 'my_quizzes' %}"
+          class="btn-pill btn-primary"
+          style="margin-left: 10px"
+          >My Quizzes</a
+        >
+      </div>
+    </div>
+
+    <div class="activity-card">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+        "
+      >
+        <h4 style="margin: 0; color: var(--hero-text); font-weight: 900">
+          <i class="bi bi-clock-history" style="margin-right: 6px"></i> Recent
+          Activity
+        </h4>
+        <a
+          href="{% url 'history' %}"
+          class="btn-pill btn-ghost"
+          style="font-weight: 700"
+          >My History</a
+        >
+      </div>
+
+      <ul class="activity-list">
+        {% for activity in recent_activities %}
+        <li class="activity-item">
+          <div class="activity-left">
+            <div class="activity-badge">{{ activity.activity_type }}</div>
+            <div class="activity-text">{{ activity.description }}</div>
+          </div>
+          <div style="color: var(--muted); font-size: 0.9rem">
+            {{ activity.timestamp|date:"M d, H:i" }}
+          </div>
+        </li>
+        {% empty %}
+        <li
+          class="activity-item"
+          style="justify-content: center; color: var(--muted)"
+        >
+          No recent activity.
+        </li>
+        {% endfor %}
+      </ul>
+
+      <div style="margin-top: 12px; text-align: center">
+        <a href="{% url 'history' %}" class="btn-pill btn-primary"
+          >View Full History</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Pie
+      const pieCtx = document.getElementById('pieCategories');
+      if (pieCtx) {
+        new Chart(pieCtx, {
+          type: 'pie',
+          data: {{ pie_data|default:"{}"|safe }},
+          options: {
+            plugins: { legend: { position:'bottom', labels:{color:'#cbd6f2'} } }
+          }
+        });
+      }
+
+      // Score line
+      const lineCtx = document.getElementById('scoreLineChart');
+      if (lineCtx) {
+        new Chart(lineCtx, {
+          type: 'line',
+          data: {{ score_progress_data|default:"{}"|safe }},
+          options: {
+            scales: {
+              x:{ticks:{color:'#A8B8D8'}},
+              y:{beginAtZero:true,ticks:{color:'#A8B8D8'}}
+            },
+            plugins:{ legend:{ display:false } }
+          }
+        });
+      }
+
+      // Time bar
+      const barCtx = document.getElementById('timeBarChart');
+      if (barCtx) {
+        new Chart(barCtx, {
+          type: 'bar',
+          data: {{ time_spent_data|default:"{}"|safe }},
+          options: {
+            scales: {
+              x:{ticks:{color:'#A8B8D8'}},
+              y:{beginAtZero:true,ticks:{color:'#A8B8D8'}}
+            },
+            plugins:{ legend:{ display:false } }
+          }
+        });
+      }
+  });
+</script>
+{% endblock %}

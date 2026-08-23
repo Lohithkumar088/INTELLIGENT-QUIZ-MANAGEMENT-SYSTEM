@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login | SmartLearn{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Login page overall structure */
+  .login-wrap {
+    min-height: 78vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 20px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    gap: 28px;
+    align-items: stretch;
+    padding: 30px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.006));
+    border: 1px solid rgba(255,255,255,0.04);
+    box-shadow: 0 36px 90px rgba(2,6,20,0.7), inset 0 1px 40px rgba(255,255,255,0.01);
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+
+  .login-card:hover { transform: translateY(-4px); }
+
+  /* LEFT SIDE */
+  .login-left {
+    flex: 1 1 60%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:10px;
+  }
+  .login-heading {
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: #dcdcff;
+    letter-spacing: -0.6px;
+    text-shadow: 0 6px 26px rgba(120,100,255,0.16);
+  }
+  .login-sub {
+    color: rgba(220,230,255,0.72);
+    margin-bottom: 10px;
+    line-height:1.45;
+  }
+
+  /* Form styling */
+  .form-group { margin-bottom: 18px; }
+  .form-label { color:rgba(220,230,255,0.9); font-weight:700; margin-bottom:8px; }
+
+  .input-icon { position: relative; }
+  .input-icon i {
+    position:absolute; left:12px; top:50%;
+    transform:translateY(-50%);
+    color:rgba(220,230,255,0.48);
+    font-size:1.05rem;
+  }
+
+  .form-control {
+    width:100%;
+    padding:12px 12px 12px 40px;
+    border-radius:10px;
+    background: rgba(255,255,255,0.02);
+    border:1px solid rgba(255,255,255,0.04);
+    color:#eaf2ff;
+  }
+  .form-control::placeholder { color:rgba(230,240,255,0.4); }
+
+  .form-check { display:flex; align-items:center; gap:8px; }
+
+  /* Actions row */
+  .login-actions {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .forgot {
+    color:#8eaaff;
+    font-weight:700;
+    text-decoration:none;
+  }
+  .forgot:hover { text-decoration:underline; }
+
+  /* Login button */
+  .btn-login {
+    width:100%;
+    padding:12px 20px;
+    border-radius:999px;
+    border:none;
+    font-weight:800;
+    font-size:1rem;
+    color:#fff;
+    background: linear-gradient(90deg,#8b6cff,#6aaeff);
+    box-shadow:0 18px 46px rgba(100,80,220,0.15);
+    transition: transform .12s ease;
+  }
+  .btn-login:hover { transform:translateY(-2px); }
+
+  .signup-line {
+    color:rgba(210,220,235,0.85);
+    margin-top:16px;
+  }
+  .signup-line a { color:#8eaaff; font-weight:700; text-decoration:none; }
+  .signup-line a:hover { text-decoration:underline; }
+
+  /* RIGHT SIDE — Perfect Logo Fit Box */
+  .login-right {
+    flex: 0 0 360px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .logo-frame {
+    width:100%;
+    max-width:330px;
+    height:240px;
+    border-radius:18px;
+    background: rgba(255,255,255,0.01);
+    border:1px solid rgba(255,255,255,0.05);
+    box-shadow:
+      0 25px 80px rgba(3,5,15,0.8),
+      inset 0 6px 24px rgba(255,255,255,0.02);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    padding:14px;
+  }
+
+  .logo-frame img {
+    width: 122%;
+    height: 122%;
+    object-fit: contain;
+    transform: scale(1.3);   /* ✨ Perfect same zoom as home page */
+    transform-origin: center;
+    filter: drop-shadow(0 16px 36px rgba(100,80,255,0.22));
+  }
+
+  /* Messages */
+  .login-messages {
+    width:100%;
+    max-width:1100px;
+    margin: 0 auto 16px;
+  }
+
+  /* Responsive */
+  @media (max-width:900px) {
+    .login-card { flex-direction:column; }
+    .login-right { order:-1; margin-bottom: 20px; }
+    .login-heading { font-size:2rem; }
+  }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="login-messages">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" role="alert"
+           style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);color:#eaf2ff;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+
+<div class="login-wrap">
+  <div class="login-card" role="main">
+
+    <!-- LEFT SIDE -->
+    <div class="login-left">
+      <h1 class="login-heading">Welcome Back</h1>
+      <p class="login-sub">
+        Log in to continue to SmartLearn — access your quizzes, progress and personalized practice.
+      </p>
+
+      <form method="post" autocomplete="off" novalidate>
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label" for="id_username">Username</label>
+          <div class="input-icon">
+            <i class="bi bi-person-fill"></i>
+            <input id="id_username" type="text" name="username"
+                   class="form-control" placeholder="Enter username" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_password">Password</label>
+          <div class="input-icon">
+            <i class="bi bi-lock-fill"></i>
+            <input id="id_password" type="password" name="password"
+                   class="form-control" placeholder="Enter password" required>
+          </div>
+        </div>
+
+        <div class="login-actions">
+          <div class="form-check">
+            <input id="rememberMe" type="checkbox" name="remember" class="form-check-input">
+            <label for="rememberMe" class="form-check-label" style="color:rgba(210,220,235,0.9);">
+              Remember me
+            </label>
+          </div>
+
+          <a href="{% url 'password_reset' %}" class="forgot">
+            Forgot password?
+          </a>
+        </div>
+
+        <button type="submit" class="btn-login" style="margin-top:18px;">Login</button>
+
+        <div class="signup-line">
+          Don't have an account? <a href="{% url 'register' %}">Sign Up</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT SIDE (Logo) -->
+    <div class="login-right">
+      <div class="logo-frame">
+        <img src="{% static 'img/smartlearn_logo.png' %}" alt="SmartLearn logo">
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+/* ===== Page Background (MATCHED) ===== */
+body {
+    background:
+      radial-gradient(1200px 600px at top, rgba(120,110,255,0.12), transparent 60%),
+      linear-gradient(180deg, #0b1020 0%, #050814 100%);
+}
+
+/* ===== Container ===== */
+.container-wrapper {
+    max-width: 1200px;
+    margin: auto;
+    padding: 2.5rem 1rem 4rem;
+    min-height: 80vh;
+}
+
+/* ===== Title ===== */
+.page-title {
+    text-align: center;
+    color: #eaf2ff;
+    font-weight: 800;
+    margin-bottom: 0.4rem;
+}
+
+.divider {
+    width: 70px;
+    height: 4px;
+    background: linear-gradient(90deg, #7a6cff, #b9b2ff);
+    border-radius: 2px;
+    margin: 0.6rem auto 2.2rem;
+}
+
+/* ===== Subcategory Card (MATCHED STYLE) ===== */
+.subcategory-card {
+    background: rgba(255,255,255,0.035);
+    border-radius: 16px;
+    padding: 26px 22px;
+    border: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    height: 100%;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+    text-align: center;
+}
+
+.subcategory-card h5 {
+    font-weight: 700;
+    color: #8aa8ff;
+    margin-bottom: 0.5rem;
+}
+
+.subcategory-card p {
+    font-size: 0.95rem;
+    color: rgba(234,242,255,0.75);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.subcategory-card:hover,
+.subcategory-card.selected {
+    transform: translateY(-10px);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.85);
+    border-color: rgba(140,110,255,0.35);
+    background: rgba(255,255,255,0.05);
+}
+
+/* ===== Form Section ===== */
+.form-section {
+    margin-top: 2rem;
+}
+
+label {
+    color: #eaf2ff;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+/* ===== Select ===== */
+.form-select {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    border: 1.5px solid rgba(140,110,255,0.4);
+    border-radius: 10px;
+}
+
+.form-select:focus {
+    background: rgba(255,255,255,0.07);
+    border-color: #b9b2ff;
+    box-shadow: none;
+}
+
+/* ===== Buttons ===== */
+.btn-primary {
+    background: linear-gradient(90deg, #7a6cff, #9d94ff);
+    border: none;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 11px 30px;
+    box-shadow: 0 8px 26px rgba(120,110,255,0.55);
+}
+
+.btn-primary:disabled {
+    background: #555;
+    box-shadow: none;
+}
+
+/* ===== Loading Overlay ===== */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,8,20,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-overlay.show {
+    display: flex;
+}
+
+.loading-modal {
+    background: #0b1020;
+    border: 2px solid rgba(140,110,255,0.5);
+    border-radius: 18px;
+    padding: 40px 52px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(120,110,255,0.55);
+}
+
+.loading-spinner {
+    width: 56px;
+    height: 56px;
+    border: 4px solid rgba(255,255,255,0.15);
+    border-top: 4px solid #b9b2ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 18px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: #eaf2ff;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.loading-subtext {
+    color: rgba(234,242,255,0.7);
+    font-size: 0.95rem;
+    margin-top: 6px;
+}
+</style>
+
+<div class="container-wrapper">
+
+    <a href="{% url 'categories' %}" class="btn btn-secondary mb-3">
+        ← Back to Categories
+    </a>
+
+    <h2 class="page-title">Select Subcategory</h2>
+    <div class="divider"></div>
+
+    {% if error %}
+        <div class="alert alert-warning">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" id="quiz-form">
+        {% csrf_token %}
+
+        <div class="row g-4 mb-4">
+            {% for sub in subcategories %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="subcategory-card"
+                     data-subcat="{{ sub.id }}"
+                     onclick="selectSubcategory(this)">
+                    <h5>{{ sub.name }}</h5>
+                    <p>{{ sub.description }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <input type="hidden" name="subcategory" id="subcategory-input" required>
+
+        <div class="row g-3 form-section">
+            <div class="col-md-6">
+                <label>Difficulty</label>
+                <select name="difficulty" class="form-select" required>
+                    <option value="easy" selected>Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label>Number of Questions</label>
+                <select name="num_questions" class="form-select" required>
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary" id="start-quiz-btn" disabled>
+                Start Quiz
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loading-overlay">
+    <div class="loading-modal">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Generating Quiz...</div>
+        <div class="loading-subtext">Please wait</div>
+    </div>
+</div>
+
+<script>
+function selectSubcategory(card) {
+    document.querySelectorAll('.subcategory-card')
+        .forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+
+    document.getElementById('subcategory-input').value =
+        card.getAttribute('data-subcat');
+    document.getElementById('start-quiz-btn').disabled = false;
+}
+
+document.getElementById('quiz-form').addEventListener('submit', function () {
+    document.getElementById('loading-overlay').classList.add('show');
+    document.getElementById('start-quiz-btn').disabled = true;
+});
+</script>
+
+{% endblock %}

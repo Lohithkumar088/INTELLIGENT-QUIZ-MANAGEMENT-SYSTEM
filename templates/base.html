@@ -1,0 +1,228 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{% block title %}SmartLearn{% endblock %}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Bootstrap & icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    /* ---------- NAVBAR THEME ---------- */
+    :root{
+      --nav-bg: rgba(8,10,20,0.75);
+      --nav-border: rgba(255,255,255,0.04);
+      --brand-gradient-start: #8a8dff;
+      --brand-gradient-end: #68bdff;
+    }
+
+    body{
+      margin:0;
+      font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(180deg,#070817 0%, #0e1624 100%);
+      color:#eaf2ff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* navbar */
+    .sl-navbar{
+      position:sticky;
+      top:0;
+      z-index:9999;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--nav-border);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 6px 24px rgba(2,4,10,0.55);
+    }
+    .sl-nav-inner{
+      max-width:1400px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      padding:14px 20px;
+    }
+
+    .sl-brand {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+    }
+
+    .sl-logo{
+      width:56px; height:56px; border-radius:10px; overflow:hidden;
+      box-shadow: 0 10px 30px rgba(60,40,120,0.14), inset 0 2px 8px rgba(255,255,255,0.02);
+      flex-shrink:0;
+      background:linear-gradient(90deg,#0b0b12,#131625);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .sl-logo img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .sl-brand-text{
+      font-size:1.45rem;
+      font-weight:900;
+      letter-spacing:-0.6px;
+      background: linear-gradient(90deg,var(--brand-gradient-start),var(--brand-gradient-end));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      text-shadow: 0 0 18px rgba(120,110,255,0.22);
+    }
+
+    /* main nav links */
+    .sl-main{ display:flex; gap:22px; align-items:center; }
+    .sl-link {
+      color: #dbe8ff;
+      text-decoration:none;
+      font-weight:700;
+      display:flex; gap:10px; align-items:center;
+      padding:8px 10px; border-radius:10px;
+      transition: transform .12s ease, background .12s ease;
+      opacity:0.92;
+    }
+    .sl-link:hover{ transform:translateY(-3px); background: rgba(255,255,255,0.02); color:#fff; }
+    .sl-pill {
+      background: linear-gradient(90deg,var(--brand-gradient-start),var(--brand-gradient-end));
+      color:white; padding:9px 18px; border-radius:18px; font-weight:800;
+      display:inline-flex; gap:8px; align-items:center;
+      box-shadow: 0 14px 36px rgba(90,80,220,0.18);
+    }
+
+    .sl-actions{ display:flex; gap:12px; align-items:center; }
+    .sl-actions a{
+      display:inline-flex; gap:8px; align-items:center; padding:8px 12px; border-radius:10px;
+      background: rgba(255,255,255,0.03); color:#e8f4ff; text-decoration:none; font-weight:700;
+    }
+    .sl-actions a:hover{ background: rgba(255,255,255,0.06); transform:translateY(-3px); }
+
+    /* mobile */
+    #sl-hamburger{ display:none; background:none; border:0; }
+    #sl-hamburger .bar{ width:22px; height:3px; background:#fff; border-radius:3px; display:block; margin:3px 0; }
+
+    .sl-mobile-menu{ display:none; padding:12px; margin:10px 20px; border-radius:12px; background:rgba(6,8,20,0.95); }
+
+    @media (max-width:1000px){
+      .sl-main{ display:none; }
+      #sl-hamburger{ display:block; }
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  {# Alerts #}
+  {% if messages %}
+    <div style="position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:11000;width:clamp(300px,40vw,680px);">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="box-shadow:0 8px 40px rgba(2,6,20,0.5);">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- NAVBAR -->
+  <header class="sl-navbar" role="banner">
+    <div class="sl-nav-inner">
+
+      {# LOGO: when logged out go to login, otherwise to home #}
+      {% if user.is_authenticated %}
+        <a class="sl-brand" href="{% url 'home' %}">
+      {% else %}
+        <a class="sl-brand" href="{% url 'login' %}">
+      {% endif %}
+          
+          <span class="sl-brand-text">SmartLearn</span>
+        </a>
+
+      {# MAIN LINKS #}
+      <nav class="sl-main" role="navigation" aria-label="Main navigation">
+        <a class="sl-pill" href="{% url 'home' %}">
+          <i class="bi bi-house-fill"></i> Home
+        </a>
+
+        {# categories -> login if logged out #}
+        {% if user.is_authenticated %}
+          <a class="sl-link" href="{% url 'categories' %}"><i class="bi bi-book-half"></i> Categories</a>
+          <a class="sl-link" href="{% url 'my_quizzes' %}"><i class="bi bi-grid-fill"></i> My Quizzes</a>
+          <a class="sl-link" href="{% url 'history' %}"><i class="bi bi-clock-history"></i> History</a>
+          <a class="sl-link" href="{% url 'help_page' %}"><i class="bi bi-question-circle-fill"></i> Help</a>
+        {% else %}
+          <a class="sl-link" href="{% url 'login' %}"><i class="bi bi-book-half"></i> Categories</a>
+          <a class="sl-link" href="{% url 'login' %}"><i class="bi bi-grid-fill"></i> My Quizzes</a>
+          <a class="sl-link" href="{% url 'login' %}"><i class="bi bi-clock-history"></i> History</a>
+          <a class="sl-link" href="{% url 'login' %}"><i class="bi bi-question-circle-fill"></i> Help</a>
+        {% endif %}
+      </nav>
+
+      {# ACTIONS (right) #}
+      <div class="sl-actions" role="group" aria-label="User actions">
+        {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> Profile</a>
+          <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        {% else %}
+          <a href="{% url 'login' %}"><i class="bi bi-door-open-fill"></i> Login</a>
+          <a href="{% url 'register' %}"><i class="bi bi-person-plus-fill"></i> Register</a>
+        {% endif %}
+      </div>
+
+      {# mobile hamburger #}
+      <button id="sl-hamburger" aria-label="Open menu" aria-expanded="false" type="button">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+    </div>
+
+    <div id="sl-mobile" class="sl-mobile-menu" aria-hidden="true">
+      <a href="{% url 'home' %}"><i class="bi bi-house-fill"></i> Home</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'categories' %}"><i class="bi bi-book-half"></i> Categories</a>
+        <a href="{% url 'my_quizzes' %}"><i class="bi bi-grid-fill"></i> My Quizzes</a>
+        <a href="{% url 'history' %}"><i class="bi bi-clock-history"></i> History</a>
+        <a href="{% url 'help_page' %}"><i class="bi bi-question-circle-fill"></i> Help</a>
+        <hr>
+        <a href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> Profile</a>
+        <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      {% else %}
+        <a href="{% url 'login' %}"><i class="bi bi-book-half"></i> Categories</a>
+        <a href="{% url 'login' %}"><i class="bi bi-grid-fill"></i> My Quizzes</a>
+        <a href="{% url 'login' %}"><i class="bi bi-clock-history"></i> History</a>
+        <a href="{% url 'login' %}"><i class="bi bi-question-circle-fill"></i> Help</a>
+        <hr>
+        <a href="{% url 'login' %}"><i class="bi bi-door-open-fill"></i> Login</a>
+        <a href="{% url 'register' %}"><i class="bi bi-person-plus-fill"></i> Register</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main style="max-width:1400px;margin:26px auto;padding:0 20px;">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  <footer style="text-align:center;padding:26px 0;color:rgba(255,255,255,0.6);">
+    © 2025 <strong>SmartLearn</strong> · Intelligent Quiz System
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const hamb = document.getElementById('sl-hamburger');
+    const mobile = document.getElementById('sl-mobile');
+    hamb && hamb.addEventListener('click', ()=>{
+      const exp = hamb.getAttribute('aria-expanded') === 'true';
+      hamb.setAttribute('aria-expanded', String(!exp));
+      mobile.classList.toggle('show');
+      mobile.setAttribute('aria-hidden', String(exp));
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

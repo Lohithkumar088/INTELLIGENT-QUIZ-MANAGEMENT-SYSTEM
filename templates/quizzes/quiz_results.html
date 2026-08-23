@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quiz Results - {{ attempt.category }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+  />
+
+  <style>
+    :root {
+      --bg-1: #292e3f;
+      --bg-2: #2a3042;
+      --accent-a: #7b72ff;
+      --accent-b: #35d0ff;
+      --muted: #abb4d7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      color: #e8eef8;
+      background: linear-gradient(135deg, #1a1f2f, #22283c);
+      padding: 18px;
+    }
+
+    .results-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .result-card {
+      width: 60vw;
+      max-width: 900px;
+      background: linear-gradient(120deg, #232646, #262d45);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .score-main {
+      font-size: 4rem;
+      font-weight: 800;
+    }
+
+    .btn-theme {
+      background: linear-gradient(90deg, #6c63ff, #00c9ff);
+      color: #fff;
+      padding: 12px 30px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      margin: 4px;
+    }
+
+    .review-section {
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .qa-card {
+      background: #20263a;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .qa-card.correct { border-left: 5px solid #2fd99b; }
+    .qa-card.incorrect { border-left: 5px solid #ff5b7a; }
+
+    .explain-btn {
+      margin-top: 10px;
+      background: rgba(70,110,255,0.15);
+      border: 1px solid rgba(70,110,255,0.3);
+      color: #8fb6ff;
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .explain-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .explanation-box {
+      margin-top: 10px;
+      background: rgba(80,130,255,0.06);
+      border-left: 4px solid #59b5ff;
+      padding: 12px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .explanation-title {
+      font-weight: 800;
+      color: #63a8ff;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+
+<body>
+<div class="results-container">
+
+  <!-- RESULT CARD -->
+  <div class="result-card">
+    <h2>Quiz Completed 🎯</h2>
+
+    <div class="score-main">
+      {{ attempt.score_percentage|default:0|floatformat:1 }}%
+    </div>
+
+    <p>{{ correct_count }} out of {{ total_questions }} correct</p>
+
+    <div style="margin-top:20px;">
+      <a href="{% url 'quiz_start' %}" class="btn-theme">Retake Quiz</a>
+      <a href="{% url 'categories' %}" class="btn-theme">Categories</a>
+    </div>
+  </div>
+
+  <!-- REVIEW SECTION -->
+  <section class="review-section">
+    <h3>Review Answers</h3>
+
+    {% for ans in answers %}
+    <div class="qa-card {% if ans.is_correct %}correct{% else %}incorrect{% endif %}">
+      <strong>Q{{ forloop.counter }}:</strong>
+      {{ ans.question.question_text }}
+
+      <div style="margin-top:8px;">
+        <strong>Your Answer:</strong>
+        {% if ans.user_answer %}
+          {{ ans.user_answer }}
+        {% else %}
+          <span style="color:#ffb07a">(No Answer)</span>
+        {% endif %}
+      </div>
+
+      {% if not ans.is_correct %}
+      <div style="margin-top:6px; color:#9fffe8;">
+        <strong>Correct Answer:</strong> {{ ans.question.answer }}
+      </div>
+      {% endif %}
+
+      {% if not ans.is_correct %}
+      <!-- AJAX EXPLANATION -->
+      <button
+        class="explain-btn"
+        onclick="generateExplanation('{{ ans.answer_id }}', this)"
+      >
+        <i class="bi bi-lightning"></i> Generate Explanation
+      </button>
+
+      <div id="exp-{{ ans.answer_id }}" class="explanation-box">
+        <div class="explanation-title">📚 AI Explanation</div>
+        <div class="explanation-text"></div>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+</div>
+
+<script>
+  // CSRF helper
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+  const CSRF_TOKEN = getCookie("csrftoken");
+
+  function generateExplanation(answerId, btn) {
+    const box = document.getElementById(`exp-${answerId}`);
+    const textEl = box.querySelector(".explanation-text");
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass"></i> Generating...';
+
+    fetch("{% url 'generate_explanation_ajax' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": CSRF_TOKEN
+      },
+      body: JSON.stringify({ answer_id: answerId })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        textEl.textContent = data.explanation;
+        box.style.display = "block";
+        btn.remove();
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = "Retry";
+        alert(data.error || "Failed to generate explanation");
+      }
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.innerHTML = "Retry";
+      alert("Network error");
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Profile - {{ user.username }}{% endblock %}
+
+{% block content %}
+<style>
+:root{
+  --bg-1:#070817;
+  --bg-2:#0e1624;
+  --muted:#b9cbe0;
+  --glass-border: rgba(255,255,255,0.05);
+  --accent-start:#8b6cff;
+  --accent-end:#6aaeff;
+  --card-shadow: rgba(3,6,20,0.62);
+  --hero-text:#d8d4ff;
+}
+
+/* Page wrapper */
+.profile-wrapper{
+  max-width:1200px;
+  margin:36px auto 120px;
+  padding:0 20px;
+  animation: fadeIn 0.36s ease;
+}
+
+/* Main glass panel */
+.profile-card{
+  background: rgba(255,255,255,0.02);
+  border:1px solid var(--glass-border);
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.55);
+}
+
+/* top row */
+.profile-top{
+  display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;
+}
+.profile-title{ font-size:1.4rem; font-weight:900; color:var(--hero-text); margin:0; }
+.profile-sub{ color:var(--muted); margin-top:6px; }
+
+/* shared button styles (match home) */
+.btn-pill{ padding:10px 18px; border-radius:50px; font-weight:700; display:inline-flex; gap:8px; align-items:center; text-decoration:none; cursor:pointer; border:none; }
+.btn-primary{ background: linear-gradient(90deg,var(--accent-start),var(--accent-end)); color:#fff; box-shadow:0 10px 30px rgba(108,99,255,0.12); }
+.btn-ghost{ background: rgba(255,255,255,0.04); color:var(--muted); border:1px solid rgba(255,255,255,0.06); }
+
+/* layout */
+.profile-grid{ display:grid; grid-template-columns:320px 1fr; gap:22px; align-items:start; }
+@media(max-width:880px){ .profile-grid{ grid-template-columns:1fr; } }
+
+/* left column */
+.profile-left{
+  padding:18px; border-radius:12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+  border:1px solid rgba(255,255,255,0.03);
+  text-align:center; position:relative;
+}
+.avatar-wrap{ position:relative; display:inline-block; }
+.profile-avatar{
+  width:150px; height:150px; border-radius:50%; object-fit:cover;
+  border:4px solid #6C63FF; box-shadow:0 12px 34px rgba(72,52,160,0.18);
+  display:block;
+}
+.avatar-edit {
+  position:absolute; right:-6px; bottom:-6px;
+  background:linear-gradient(90deg,var(--accent-start),var(--accent-end));
+  border-radius:999px; width:40px; height:40px; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 8px 20px rgba(108,99,255,0.18); cursor:pointer; border:2px solid rgba(0,0,0,0.25);
+}
+.avatar-edit i{ color:white; font-size:0.95rem; }
+
+.profile-name{ margin-top:14px; font-weight:800; color:var(--hero-text); font-size:1.35rem; }
+.profile-email{ color:var(--muted); margin-top:6px; font-size:0.95rem; }
+.profile-bio{ color:var(--muted); margin-top:12px; font-size:0.95rem; }
+
+/* quick actions */
+.small-action{
+  display:inline-block; margin:8px 6px 0 6px; padding:8px 14px; border-radius:40px;
+  background: rgba(255,255,255,0.03); color:var(--muted); font-weight:700; border:1px solid rgba(255,255,255,0.04); text-decoration:none;
+}
+.small-action:hover{ transform:translateY(-3px); }
+
+/* right column */
+.profile-right{ padding:6px; }
+
+/* info grid */
+.info-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px; }
+@media(max-width:520px){ .info-grid{ grid-template-columns:1fr; } }
+.info-item{ padding:12px; border-radius:10px; background: rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.03); }
+.info-label{ color:#A8ACB5; font-weight:700; display:block; font-size:0.85rem; }
+.info-value{ color:var(--hero-text); font-weight:800; margin-top:6px; }
+
+/* stats */
+.stats-grid{ display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-start; margin-top:6px; }
+.stat-card{ min-width:150px; padding:14px 18px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01); text-align:center; box-shadow:0 12px 28px rgba(2,4,16,0.45); }
+.stat-title{ color:#8F85FF; font-weight:700; font-size:0.95rem; }
+.stat-value{ color:var(--hero-text); font-size:1.6rem; font-weight:800; margin-top:8px; }
+
+/* XP */
+.xp-container{ margin-top:18px; }
+.xp-bar{ height:14px; border-radius:10px; background:#141521; overflow:hidden; border:1px solid rgba(255,255,255,0.04); }
+.xp-fill{ height:100%; width:0%; border-radius:10px; background: linear-gradient(90deg,var(--accent-start),var(--accent-end)); transition: width 900ms cubic-bezier(.2,.9,.2,1); }
+.xp-meta{ display:flex; justify-content:space-between; margin-top:10px; color:var(--muted); font-size:0.95rem; }
+
+/* heatmap */
+.heatmap{ display:grid; grid-template-columns: repeat(14, 18px); gap:8px; justify-content:center; margin-top:14px; margin-bottom:14px; }
+.heatbox{ width:18px; height:18px; border-radius:6px; background:#2b2f35; border:1px solid rgba(255,255,255,0.06); transition:background .18s; }
+.h0{ background:#25282c; opacity:0.35; } .h1{ background:#c9d6ff } .h2{ background:#8F85FF } .h3{ background:#6C63FF } .h4{ background:#4533A5; }
+
+/* trophy wall */
+.trophy-wall{ display:flex; gap:14px; margin-top:14px; flex-wrap:wrap; justify-content:flex-start; }
+.trophy{ padding:12px; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); min-width:120px; text-align:center; }
+
+/* modal */
+.edit-modal{ display:none; position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; }
+.modal-box{ background:#0e1622; padding:22px; width:720px; max-width:96%; border-radius:12px; border:1px solid #222835; color:#fff; box-shadow:0 30px 80px rgba(2,6,23,0.7); }
+@media(max-width:900px){ .modal-box{ width:92%; padding:18px; } }
+.form-control{ background:#0f1720; border:1px solid #2b3440; color:#fff; padding:10px; border-radius:8px; width:100%; box-sizing:border-box; }
+
+/* form label */
+.form-label{ color:#d7defb; font-size:1rem; font-weight:700; margin-bottom:8px; display:block; }
+
+/* utilities */
+.flex-between{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.center{ display:flex; align-items:center; justify-content:center; gap:10px; }
+
+@keyframes fadeIn{ from{ opacity:0; transform: translateY(6px);} to{ opacity:1; transform: translateY(0);} }
+</style>
+
+<div class="profile-wrapper">
+  <div class="profile-card">
+
+    <div class="profile-top">
+      <div>
+        <h2 class="profile-title">Your Profile</h2>
+        <div class="profile-sub">Manage your account, view progress and achievements.</div>
+      </div>
+
+      <div style="display:flex; gap:12px; align-items:center;">
+        <a class="btn-pill btn-ghost" href="{% url 'my_quizzes' %}">My Quizzes</a>
+        <a class="btn-pill btn-ghost" href="{% url 'history' %}">History</a>
+        <button class="btn-pill btn-primary" onclick="openEditModal()" aria-label="Edit profile">
+          <i class="bi bi-pencil-square" style="margin-right:8px;"></i> Edit Profile
+        </button>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <!-- LEFT -->
+      <div class="profile-left" aria-labelledby="profileName">
+        <div class="avatar-wrap">
+          {% if user.profile.avatar and user.profile.avatar.url %}
+            <img src="{{ user.profile.avatar.url }}" alt="avatar" class="profile-avatar" id="currentAvatar">
+          {% else %}
+            <img src="{% static 'img/default_avatar.png' %}" alt="avatar" class="profile-avatar" id="currentAvatar">
+          {% endif %}
+
+          <!-- avatar edit trigger (opens modal) -->
+          <div class="avatar-edit" title="Edit avatar" onclick="openEditModal()">
+            <i class="bi bi-camera"></i>
+          </div>
+        </div>
+
+        <div id="profileName" class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+        <div class="profile-email">{{ user.email }}</div>
+
+        <p class="profile-bio">{{ user.profile.bio|default:"Add a short bio about yourself to show on your profile." }}</p>
+
+        <div style="margin-top:14px;">
+          <a href="{% url 'categories' %}" class="small-action">Browse Categories</a>
+          <a href="{% url 'logout' %}" class="small-action">Logout</a>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="profile-right">
+
+        <!-- Info -->
+        <div class="info-grid" role="region" aria-label="Account information">
+          <div class="info-item">
+            <span class="info-label">Username</span>
+            <span class="info-value">{{ user.username }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ user.email }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Member Since</span>
+            <span class="info-value">{{ user.date_joined|date:"F j, Y" }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Quizzes Taken</span>
+            <span class="info-value">{{ total_quizzes|default:0 }}</span>
+          </div>
+        </div>
+
+        <!-- stats -->
+        <div class="stats-grid" role="region" aria-label="User statistics">
+          <div class="stat-card">
+            <div class="stat-title">Total Quizzes</div>
+            <div class="stat-value">{{ total_quizzes|default:0 }}</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Average Score</div>
+            <div class="stat-value">{{ avg_score|default:0 }}%</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-title">Rank</div>
+            <div class="stat-value">{{ user_rank|default:"-" }}</div>
+          </div>
+        </div>
+
+        <!-- XP -->
+        <div class="xp-container" aria-hidden="false">
+          <div class="flex-between" style="margin-bottom:8px;">
+            <div style="font-weight:800; color:#8F85FF;">{{ level|default:"Learner" }}</div>
+            <div style="color:var(--muted);">Rank #{{ user_rank|default:"-" }}</div>
+          </div>
+
+          <div class="xp-bar" aria-hidden="true">
+            <div class="xp-fill" id="xpFill"
+                 data-current="{{ xp_current|default:0 }}"
+                 data-target="{{ xp_target|default:0 }}"
+                 style="width:{{ xp_percent|default:0 }}%"></div>
+          </div>
+
+          <div class="xp-meta">
+            <div id="xpText">{{ xp_current|default:0 }} / {{ xp_target|default:0 }} XP</div>
+            <div>{{ total_quizzes|default:0 }} quizzes</div>
+          </div>
+        </div>
+
+        <!-- Activity + trophies -->
+        <div style="margin-top:18px;">
+          <div class="flex-between" style="margin-bottom:8px;">
+            <div style="color:var(--muted); font-weight:700;">Activity (last 28 days)</div>
+            <div style="font-size:0.9rem; color:var(--muted);">Active days: {{ heatmap_grid|length }}</div>
+          </div>
+
+          <div class="heatmap" id="heatmap" aria-hidden="true">
+            {% for day in heatmap_grid %}
+              {% if day.count == 0 %}
+                <div class="heatbox h0" title="{{ day.date }}: {{ day.count }} activities"></div>
+              {% elif day.count == 1 %}
+                <div class="heatbox h1" title="{{ day.date }}: {{ day.count }} activities"></div>
+              {% elif day.count <= 3 %}
+                <div class="heatbox h2" title="{{ day.date }}: {{ day.count }} activities"></div>
+              {% elif day.count <= 6 %}
+                <div class="heatbox h3" title="{{ day.date }}: {{ day.count }} activities"></div>
+              {% else %}
+                <div class="heatbox h4" title="{{ day.date }}: {{ day.count }} activities"></div>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <div class="trophy-wall" aria-hidden="true">
+            {% if badges %}
+              {% for b in badges %}
+                <div class="trophy {% if not b.earned %}locked{% endif %}">
+                  <div style="font-size:1.6rem; color:#8F85FF;"><i class="bi {{ b.icon }}"></i></div>
+                  <div class="label" style="margin-top:8px; font-weight:800; color:var(--hero-text)">{{ b.name }}</div>
+                  <div style="font-size:0.85rem; color:var(--muted);">{{ b.level|default:'bronze' }}</div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="trophy">
+                <div style="font-size:1.6rem; color:#ffc107;"><i class="bi bi-star-fill"></i></div>
+                <div class="label" style="margin-top:8px; font-weight:800; color:var(--hero-text)">Beginner</div>
+                <div style="font-size:0.85rem; color:var(--muted);">Unlocked</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn-pill btn-primary" onclick="openPasswordModal()">
+            🔑 Change Password
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div id="editProfileModal" class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="editProfileTitle">
+  <div class="modal-box">
+    <div class="flex-between mb-2">
+      <h4 id="editProfileTitle" style="margin:0;color:#d7defb;">Edit Profile</h4>
+      <button class="btn-close btn-close-white" aria-label="Close" onclick="closeEditModal()"></button>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" id="profileForm">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="profile">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+        <div>
+          <label class="form-label">Username</label>
+          {{ u_form.username }}
+          {% if u_form.username.errors %}<div class="text-danger small mt-1">{{ u_form.username.errors }}</div>{% endif %}
+        </div>
+
+        <div>
+          <label class="form-label">Email</label>
+          {{ u_form.email }}
+          {% if u_form.email.errors %}<div class="text-danger small mt-1">{{ u_form.email.errors }}</div>{% endif %}
+        </div>
+
+        <div style="grid-column:1/3;">
+          <label class="form-label">Avatar</label>
+          {{ p_form.avatar }}
+          <small style="display:block; color:var(--muted); margin-top:6px;">Choose an image to upload (preview shown below)</small>
+          <div style="margin-top:8px;">
+            <img id="avatarPreview" src="" alt="preview" style="display:none; max-width:120px; border-radius:10px; border:1px solid rgba(255,255,255,0.04);" />
+          </div>
+          {% if p_form.avatar.errors %}<div class="text-danger small mt-1">{{ p_form.avatar.errors }}</div>{% endif %}
+        </div>
+
+        <div style="grid-column:1/3;">
+          <label class="form-label">Bio</label>
+          {{ p_form.bio }}
+          {% if p_form.bio.errors %}<div class="text-danger small mt-1">{{ p_form.bio.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+        <button type="button" class="btn-pill btn-ghost" onclick="closeEditModal()">Cancel</button>
+        <button type="submit" class="btn-pill btn-primary">Save Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- CHANGE PASSWORD MODAL -->
+<div id="changePasswordModal" class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="changePasswordTitle">
+  <div class="modal-box">
+    <div class="flex-between mb-2">
+      <h4 id="changePasswordTitle" style="margin:0;color:#d7defb;" >Change Password</h4>
+      <button class="btn-close btn-close-white" aria-label="Close" onclick="closePasswordModal()"></button>
+    </div>
+
+    <form method="POST" id="pwForm">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="password">
+
+      <div style="display:grid; gap:10px;">
+        <div>
+          <label class="form-label">Current Password</label>
+          <input type="password" name="old_password" class="form-control" required>
+        </div>
+
+        <div>
+          <label class="form-label">New Password</label>
+          <input type="password" name="new_password1" class="form-control" required>
+        </div>
+
+        <div>
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" name="new_password2" class="form-control" required>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+        <button type="button" class="btn-pill btn-ghost" onclick="closePasswordModal()">Cancel</button>
+        <button type="submit" class="btn-pill btn-primary">Change Password</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* Modal open/close */
+function openEditModal(){ document.getElementById('editProfileModal').style.display = 'flex'; focusFirstInput('#editProfileModal'); }
+function closeEditModal(){ document.getElementById('editProfileModal').style.display = 'none'; }
+function openPasswordModal(){ document.getElementById('changePasswordModal').style.display = 'flex'; focusFirstInput('#changePasswordModal'); }
+function closePasswordModal(){ document.getElementById('changePasswordModal').style.display = 'none'; }
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape'){ closeEditModal(); closePasswordModal(); } });
+
+function focusFirstInput(modalSelector){
+  try {
+    var modal = document.querySelector(modalSelector);
+    if (!modal) return;
+    var el = modal.querySelector('input, textarea, select, button');
+    if (el) setTimeout(()=>el.focus(),90);
+  } catch(e){}
+}
+
+/* enhance form controls */
+document.addEventListener('DOMContentLoaded', function(){
+  ['username','email','avatar','bio','old_password','new_password1','new_password2'].forEach(function(name){
+    var el = document.querySelector('[name="'+name+'"]');
+    if (el && !el.classList.contains('form-control')) el.classList.add('form-control');
+    if (el && el.tagName === 'TEXTAREA') el.style.minHeight = '90px';
+  });
+
+  // animate xp bar
+  const xpFill = document.getElementById('xpFill');
+  if (xpFill) {
+    const percent = '{{ xp_percent|default:0 }}';
+    setTimeout(()=> xpFill.style.width = percent + '%', 80);
+  }
+
+  // heatmap fallback render if server didn't provide grid
+  const heatmapEl = document.getElementById('heatmap');
+  try {
+    const heatData = {{ heatmap_data|default:"null" }};
+    if (heatmapEl && heatmapEl.children.length === 0 && heatData) {
+      heatData.slice(0,28).forEach(v => {
+        var cls = 'h0';
+        if (v === 0) cls = 'h0';
+        else if (v === 1) cls = 'h1';
+        else if (v <= 3) cls = 'h2';
+        else if (v <= 6) cls = 'h3';
+        else cls = 'h4';
+        const box = document.createElement('div');
+        box.className = 'heatbox '+cls;
+        box.title = v + ' activities';
+        heatmapEl.appendChild(box);
+      });
+    }
+  } catch(e){}
+
+  // avatar preview: look for input[name="avatar"] inside form
+  try {
+    const avatarInput = document.querySelector('#profileForm [name="avatar"], [name="avatar"]');
+    const previewImg = document.getElementById('avatarPreview');
+    const currentAvatar = document.getElementById('currentAvatar');
+
+    if (avatarInput) {
+      avatarInput.addEventListener('change', function(ev){
+        const file = ev.target.files && ev.target.files[0];
+        if (!file) { if (previewImg) previewImg.style.display = 'none'; return; }
+        const reader = new FileReader();
+        reader.onload = function(e){
+          if (previewImg) { previewImg.src = e.target.result; previewImg.style.display = 'block'; previewImg.style.marginTop = '10px'; }
+          // also temporarily update main avatar (visual feedback)
+          if (currentAvatar) currentAvatar.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  } catch(e){ console.error(e); }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+Django==4.2.11
+djangorestframework
+django-crispy-forms
+crispy-bootstrap5
+django-widget-tweaks
+
+requests
+python-dotenv
+Pillow
+
+# AI / APIs
+openai
+google-generativeai
+google-api-core
+google-auth
+google-auth-httplib2
+google-auth-oauthlib
+
+# Database
+psycopg2-binary
+
+# Server
+gunicorn
+whitenoise

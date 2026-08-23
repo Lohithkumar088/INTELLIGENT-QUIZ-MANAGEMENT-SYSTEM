@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Home | SmartLearn
+{% endblock %}
+
+{% block content %}
+
+<style>
+  :root {
+    --bg-1: #070817;
+    --bg-2: #0e1624;
+    --muted: #b9cbe0;
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --accent-pill-start: #8b6cff;
+    --accent-pill-end: #6aaeff;
+    --card-shadow: rgba(3, 6, 20, 0.62);
+    --hero-text: #d8d4ff; /* single hero text color */
+  }
+
+  /* page container */
+  .page-wrap {
+    max-width: 1200px;
+    margin: 30px auto 120px;
+    padding: 0 20px;
+  }
+
+  /* HERO */
+  .hero {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 46px 32px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  }
+  .hero-left {
+    flex: 1 1 64%;
+  }
+  .hero-title {
+    font-size: 3.4rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+    line-height: 1.02;
+    color: var(--hero-text); /* unified color */
+    /* neon glow (kept) */
+    text-shadow:
+      0 0 12px rgba(140, 110, 255, 0.6),
+      0 0 28px rgba(140, 110, 255, 0.5),
+      0 0 55px rgba(140, 110, 255, 0.35),
+      0 0 80px rgba(140, 110, 255, 0.28);
+    animation: neonPulse 3.5s ease-in-out infinite;
+  }
+  /* remove separate color for <strong> so it's the same as the rest */
+  .hero-title strong {
+    color: var(--hero-text);
+    /* match glow to the hero text too */
+    text-shadow:
+      0 0 12px rgba(140, 110, 255, 0.6),
+      0 0 28px rgba(140, 110, 255, 0.5),
+      0 0 55px rgba(140, 110, 255, 0.35),
+      0 0 80px rgba(140, 110, 255, 0.28);
+  }
+
+  /* small subtitle */
+  .hero-sub {
+    color: var(--muted);
+    font-size: 1.05rem;
+    margin-bottom: 24px;
+  }
+
+  /* buttons */
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .btn-pill {
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-weight: 700;
+    display: inline-flex;
+    gap: 8px;
+    text-decoration: none;
+    align-items: center;
+  }
+  .btn-primary {
+    background: linear-gradient(
+      90deg,
+      var(--accent-pill-start),
+      var(--accent-pill-end)
+    );
+    color: #fff;
+  }
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--muted);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* hero logo area - improved fitting */
+  .hero-logo-box {
+    width: 350px;
+    height: 220px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow:
+      0 18px 48px rgba(2, 4, 16, 0.6),
+      inset 0 6px 24px rgba(255, 255, 255, 0.01);
+    padding: 18px;
+  }
+  .hero-logo {
+    width: 120%; /* zoom slightly */
+    height: 120%; /* zoom slightly */
+    object-fit: contain;
+    display: block;
+
+    transform: scale(1.6); /* perfect zoom level */
+    transform-origin: center;
+
+    filter: drop-shadow(0 12px 32px rgba(90, 60, 220, 0.25));
+
+    border-radius: 12px;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.7)
+    );
+  }
+
+  /* CATEGORIES: add perspective so 3D transform feels realistic */
+  .categories {
+    margin-top: 40px;
+    perspective: 1400px;
+    -webkit-perspective: 1400px;
+  }
+  .cat-grid-top,
+  .cat-grid-bottom {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 26px;
+    margin-bottom: 26px;
+    transform-style: preserve-3d;
+  }
+
+  /* card base */
+  .cat-card {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 34px 22px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    box-shadow: 0 14px 36px var(--card-shadow);
+    transition:
+      transform 0.36s cubic-bezier(0.18, 0.9, 0.32, 1),
+      box-shadow 0.36s cubic-bezier(0.18, 0.9, 0.32, 1);
+    transform-style: preserve-3d;
+    will-change: transform;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.006),
+      rgba(255, 255, 255, 0.01)
+    );
+    pointer-events: none;
+    transition: opacity 0.36s ease;
+    opacity: 0;
+  }
+  .cat-card:hover::after {
+    opacity: 1;
+  }
+  .cat-card:hover {
+    transform: translateY(-18px) rotateX(5deg) translateZ(8px);
+    box-shadow: 0 38px 110px rgba(6, 10, 24, 0.78);
+  }
+
+  .cat-card h4 {
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 2px 12px rgba(60, 40, 120, 0.03);
+  }
+  .cat-card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+  }
+
+  .btn-start-small {
+    padding: 10px 20px;
+    border-radius: 40px;
+    background: linear-gradient(
+      90deg,
+      var(--accent-pill-start),
+      var(--accent-pill-end)
+    );
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 12px 30px rgba(90, 70, 200, 0.12);
+    transition: transform 0.12s ease;
+  }
+  .btn-start-small:hover {
+    transform: translateY(-3px);
+  }
+
+  /* Features row */
+  .feature-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 42px;
+  }
+  .big-feature {
+    padding: 32px 22px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    text-align: center;
+    box-shadow: 0 18px 56px rgba(0, 0, 0, 0.55);
+    transition: transform 0.28s cubic-bezier(0.18, 0.9, 0.32, 1);
+    transform-style: preserve-3d;
+  }
+  .big-feature:hover {
+    transform: translateY(-12px) rotateX(3deg);
+  }
+  .big-feature .icon-wrap {
+    font-size: 34px;
+    margin-bottom: 14px;
+  }
+  .big-feature h3 {
+    font-size: 1.2rem;
+    font-weight: 900;
+    margin-bottom: 12px;
+    color: #f7fbff;
+    text-shadow: 0 6px 18px rgba(80, 70, 200, 0.06);
+  }
+  .big-feature p {
+    color: var(--muted);
+    margin-bottom: 26px;
+  }
+  .btn-coral {
+    padding: 12px 24px;
+    border-radius: 40px;
+    background: linear-gradient(90deg, #ff9e7a, #ff7a59);
+    color: #0e1624;
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  /* responsive */
+  @media (max-width: 900px) {
+    .hero {
+      flex-direction: column;
+      text-align: center;
+    }
+    .hero-logo-box {
+      width: 100%;
+      height: auto;
+      padding: 14px;
+    }
+    .cat-grid-top,
+    .cat-grid-bottom,
+    .feature-row {
+      grid-template-columns: 1fr;
+    }
+    .hero-title {
+      font-size: 2rem;
+    }
+  }
+
+  /* neon pulse animation */
+  @keyframes neonPulse {
+    0% {
+      filter: none;
+      opacity: 1;
+    }
+    50% {
+      filter: drop-shadow(0 0 18px rgba(140, 110, 255, 0.18));
+      opacity: 1;
+    }
+    100% {
+      filter: none;
+      opacity: 1;
+    }
+  }
+</style>
+
+<div class="page-wrap">
+  <!-- HERO -->
+  <section class="hero" role="banner" aria-label="Welcome section">
+    <div class="hero-left">
+      <h1 class="hero-title">Welcome to <strong>SmartLearn</strong></h1>
+      <p class="hero-sub">
+        Practical, AI-powered quizzes for focused practice — create, attempt and
+        improve with instant explanations and analytics.
+      </p>
+
+      <div class="hero-actions">
+        {% if user.is_authenticated %}
+        <a class="btn-pill btn-primary" href="{% url 'categories' %}"
+          >▶ Start Quiz</a
+        >
+        <a class="btn-pill btn-ghost" href="{% url 'my_quizzes' %}"
+          >My Quizzes</a
+        >
+        {% else %}
+        <a class="btn-pill btn-primary" href="{% url 'login' %}"
+          >Login to Start</a
+        >
+        <a class="btn-pill btn-ghost" href="{% url 'register' %}">Register</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="hero-logo-box" aria-hidden="true">
+      <!-- logo placed to the right; object-fit:contain ensures it fits -->
+      <img
+        src="{% static 'img/smartlearn_logo.png' %}"
+        alt="SmartLearn logo"
+        class="hero-logo"
+      />
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="categories" aria-label="Popular categories">
+    <div class="cat-grid-top" role="list">
+      <div class="cat-card" role="listitem">
+        <h4>Academic</h4>
+        <p>Explore fun and challenging quizzes.</p>
+        {% if user.is_authenticated %}
+        <a class="btn-start-small" href="/quizzes/category/1/select/"
+          >Start Quiz</a
+        >
+        {% else %}
+        <a class="btn-start-small" href="{% url 'login' %}">Start Quiz</a>
+        {% endif %}
+      </div>
+
+      <div class="cat-card" role="listitem">
+        <h4>Entertainment</h4>
+        <p>Movies, music & pop culture.</p>
+        {% if user.is_authenticated %}
+        <a class="btn-start-small" href="/quizzes/category/4/select/"
+          >Start Quiz</a
+        >
+        {% else %}
+        <a class="btn-start-small" href="{% url 'login' %}">Start Quiz</a>
+        {% endif %}
+      </div>
+
+      <div class="cat-card" role="listitem">
+        <h4>General Knowledge</h4>
+        <p>Wide-ranging questions across many topics.</p>
+        {% if user.is_authenticated %}
+        <a class="btn-start-small" href="/quizzes/category/3/select/"
+          >Start Quiz</a
+        >
+        {% else %}
+        <a class="btn-start-small" href="{% url 'login' %}">Start Quiz</a>
+        {% endif %}
+      </div>
+
+      <div class="cat-card" role="listitem">
+        <h4>Sports</h4>
+        <p>Rules, records and famous moments.</p>
+        {% if user.is_authenticated %}
+        <a class="btn-start-small" href="/quizzes/category/5/select/"
+          >Start Quiz</a
+        >
+        {% else %}
+        <a class="btn-start-small" href="{% url 'login' %}">Start Quiz</a>
+        {% endif %}
+      </div>
+
+      <div class="cat-card" role="listitem">
+        <h4>Literature</h4>
+        <p>Authors, plots & excerpts.</p>
+        {% if user.is_authenticated %}
+        <a class="btn-start-small" href="/quizzes/category/6/select/"
+          >Start Quiz</a
+        >
+        {% else %}
+        <a class="btn-start-small" href="{% url 'login' %}">Start Quiz</a>
+        {% endif %}
+      </div>
+
+      <div class="cat-card" role="listitem">
+        <h4>Science</h4>
+        <p>Concepts & principles.</p>
+        {% if user.is_authenticated %}
+        <a class="btn-start-small" href="/quizzes/category/2/select/"
+          >Start Quiz</a
+        >
+        {% else %}
+        <a class="btn-start-small" href="{% url 'login' %}">Start Quiz</a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% endblock %}
+  </section>
+</div>
