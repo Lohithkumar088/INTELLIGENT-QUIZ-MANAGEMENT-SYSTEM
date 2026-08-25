@@ -89,19 +89,19 @@
   .cards-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 22px;
+    gap: 16px;
     margin: 20px 0;
   }
-  @media (max-width: 920px) {
+  @media (max-width: 768px) {
     .cards-row {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
     }
   }
 
   .score-card {
     border-radius: 16px;
-    padding: 22px;
-    min-height: 150px;
+    padding: clamp(12px, 3vw, 22px);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -109,7 +109,7 @@
     text-align: center;
     background: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.01),
+      rgba(255, 255, 255, 0.02),
       rgba(255, 255, 255, 0.008)
     );
     border: 1px solid var(--glass-border);
@@ -119,38 +119,40 @@
       box-shadow 0.22s ease;
   }
   .score-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 40px 120px rgba(6, 10, 24, 0.78);
-    border-color: rgba(140, 110, 255, 0.08);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(6, 10, 24, 0.78);
+    border-color: rgba(140, 110, 255, 0.15);
   }
 
   .score-icon {
-    width: 56px;
-    height: 56px;
+    width: clamp(38px, 8vw, 56px);
+    height: clamp(38px, 8vw, 56px);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     background: linear-gradient(
       90deg,
-      rgba(139, 108, 255, 0.12),
-      rgba(106, 174, 255, 0.08)
+      rgba(139, 108, 255, 0.15),
+      rgba(106, 174, 255, 0.1)
     );
-    box-shadow: 0 12px 34px rgba(108, 99, 255, 0.06);
+    box-shadow: 0 8px 24px rgba(108, 99, 255, 0.08);
     color: var(--hero-text);
-    font-size: 1.4rem;
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
   }
   .stat-title {
     color: var(--muted);
     font-weight: 700;
-    margin-bottom: 8px;
+    font-size: clamp(0.72rem, 2.5vw, 0.95rem);
+    margin-bottom: 4px;
   }
   .stat-value {
     color: var(--hero-text);
-    font-size: 1.9rem;
+    font-size: clamp(1.1rem, 3.8vw, 1.8rem);
     font-weight: 900;
-    letter-spacing: 1px;
+    letter-spacing: -0.5px;
+    word-break: break-word;
   }
 
   /* charts panel (glass) */
@@ -380,7 +382,7 @@
     <div class="score-card">
       <div class="score-icon"><i class="bi bi-star-fill"></i></div>
       <div class="stat-title">Average Score</div>
-      <div class="stat-value">{{ avg_score|default:0 }}%</div>
+      <div class="stat-value">{{ avg_score|default:0|floatformat:1 }}%</div>
     </div>
 
     <div class="score-card">
@@ -439,7 +441,7 @@
             <div class="perf-title">Best Performance</div>
             {% if best_attempt %}
             <div class="perf-value" style="color: #8f85ff">
-              {{ best_attempt.category }} — {{ best_attempt.score_percentage }}%
+              {{ best_attempt.category }} — {{ best_attempt.score_percentage|floatformat:1 }}%
             </div>
             {% else %}
             <div class="perf-value" style="color: var(--muted)">
@@ -458,8 +460,7 @@
             <div class="perf-title">Needs Improvement</div>
             {% if needs_improve %}
             <div class="perf-value" style="color: #ff7a7a">
-              {{ needs_improve.category }} — {{ needs_improve.score_percentage
-              }}%
+              {{ needs_improve.category }} — {{ needs_improve.score_percentage|floatformat:1 }}%
             </div>
             {% else %}
             <div class="perf-value" style="color: var(--muted)">
