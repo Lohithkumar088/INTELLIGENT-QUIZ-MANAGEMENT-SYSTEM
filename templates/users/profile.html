@@ -34,10 +34,19 @@
 
 /* top row */
 .profile-top{
-  display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px;
+  display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:20px; flex-wrap: wrap;
 }
-.profile-title{ font-size:1.4rem; font-weight:900; color:var(--hero-text); margin:0; }
-.profile-sub{ color:var(--muted); margin-top:6px; }
+.profile-top-actions {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+}
+@media(max-width: 768px) {
+  .profile-top { flex-direction: column; align-items: flex-start; }
+  .profile-top-actions { width: 100%; justify-content: flex-start; }
+  .profile-top-actions .btn-pill { flex: 1; justify-content: center; min-width: 100px; font-size: 0.9rem; padding: 10px 12px; }
+}
+
+.profile-title{ font-size:clamp(1.4rem, 4.5vw, 1.8rem); font-weight:900; color:var(--hero-text); margin:0; }
+.profile-sub{ color:var(--muted); margin-top:4px; font-size: 0.95rem; }
 
 /* shared button styles (match home) */
 .btn-pill{ padding:10px 18px; border-radius:50px; font-weight:700; display:inline-flex; gap:8px; align-items:center; text-decoration:none; cursor:pointer; border:none; }
@@ -45,81 +54,86 @@
 .btn-ghost{ background: rgba(255,255,255,0.04); color:var(--muted); border:1px solid rgba(255,255,255,0.06); }
 
 /* layout */
-.profile-grid{ display:grid; grid-template-columns:320px 1fr; gap:22px; align-items:start; }
+.profile-grid{ display:grid; grid-template-columns:300px 1fr; gap:22px; align-items:start; }
 @media(max-width:880px){ .profile-grid{ grid-template-columns:1fr; } }
 
 /* left column */
 .profile-left{
-  padding:18px; border-radius:12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-  border:1px solid rgba(255,255,255,0.03);
+  padding:20px 16px; border-radius:14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));
+  border:1px solid rgba(255,255,255,0.04);
   text-align:center; position:relative;
 }
 .avatar-wrap{ position:relative; display:inline-block; }
 .profile-avatar{
-  width:150px; height:150px; border-radius:50%; object-fit:cover;
-  border:4px solid #6C63FF; box-shadow:0 12px 34px rgba(72,52,160,0.18);
-  display:block;
+  width: clamp(110px, 26vw, 140px); height: clamp(110px, 26vw, 140px); border-radius:50%; object-fit:cover;
+  border:4px solid #6C63FF; box-shadow:0 12px 34px rgba(72,52,160,0.25);
+  display:block; margin: 0 auto;
 }
 .avatar-edit {
-  position:absolute; right:-6px; bottom:-6px;
+  position:absolute; right:0px; bottom:0px;
   background:linear-gradient(90deg,var(--accent-start),var(--accent-end));
-  border-radius:999px; width:40px; height:40px; display:flex; align-items:center; justify-content:center;
-  box-shadow:0 8px 20px rgba(108,99,255,0.18); cursor:pointer; border:2px solid rgba(0,0,0,0.25);
+  border-radius:999px; width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 8px 20px rgba(108,99,255,0.25); cursor:pointer; border:2px solid rgba(0,0,0,0.3);
 }
 .avatar-edit i{ color:white; font-size:0.95rem; }
 
-.profile-name{ margin-top:14px; font-weight:800; color:var(--hero-text); font-size:1.35rem; }
-.profile-email{ color:var(--muted); margin-top:6px; font-size:0.95rem; }
-.profile-bio{ color:var(--muted); margin-top:12px; font-size:0.95rem; }
+.profile-name{ margin-top:14px; font-weight:800; color:var(--hero-text); font-size:clamp(1.2rem, 3.5vw, 1.4rem); }
+.profile-email{ color:var(--muted); margin-top:4px; font-size:0.9rem; word-break: break-all; }
+.profile-bio{ color:var(--muted); margin-top:10px; font-size:0.92rem; line-height: 1.4; }
 
 /* quick actions */
 .small-action{
-  display:inline-block; margin:8px 6px 0 6px; padding:8px 14px; border-radius:40px;
-  background: rgba(255,255,255,0.03); color:var(--muted); font-weight:700; border:1px solid rgba(255,255,255,0.04); text-decoration:none;
+  display:inline-block; margin:6px 4px 0 4px; padding:8px 14px; border-radius:40px;
+  background: rgba(255,255,255,0.03); color:var(--muted); font-weight:700; border:1px solid rgba(255,255,255,0.05); text-decoration:none; font-size: 0.88rem;
 }
-.small-action:hover{ transform:translateY(-3px); }
+.small-action:hover{ transform:translateY(-2px); color: #fff; }
 
 /* right column */
-.profile-right{ padding:6px; }
+.profile-right{ padding:0px; }
 
 /* info grid */
-.info-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px; }
-@media(max-width:520px){ .info-grid{ grid-template-columns:1fr; } }
-.info-item{ padding:12px; border-radius:10px; background: rgba(255,255,255,0.01); border:1px solid rgba(255,255,255,0.03); }
-.info-label{ color:#A8ACB5; font-weight:700; display:block; font-size:0.85rem; }
-.info-value{ color:var(--hero-text); font-weight:800; margin-top:6px; }
+.info-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+@media(max-width:520px){ .info-grid{ grid-template-columns:1fr 1fr; gap: 8px; } }
+.info-item{ padding:12px; border-radius:10px; background: rgba(255,255,255,0.015); border:1px solid rgba(255,255,255,0.04); }
+.info-label{ color:#A8ACB5; font-weight:700; display:block; font-size:0.8rem; }
+.info-value{ color:var(--hero-text); font-weight:800; margin-top:4px; font-size: clamp(0.95rem, 3vw, 1.1rem); word-break: break-word; }
 
 /* stats */
-.stats-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-top:6px; }
-.stat-card{ padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01); text-align:center; box-shadow:0 12px 28px rgba(2,4,16,0.45); }
-.stat-title{ color:#8F85FF; font-weight:700; font-size:0.9rem; }
-.stat-value{ color:var(--hero-text); font-size:clamp(1.3rem, 4vw, 1.6rem); font-weight:800; margin-top:6px; }
+.stats-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:6px; }
+@media(max-width: 480px){ .stats-grid{ grid-template-columns: repeat(3, 1fr); gap: 6px; } }
+.stat-card{ padding:12px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.015); text-align:center; box-shadow:0 12px 28px rgba(2,4,16,0.45); }
+.stat-title{ color:#8F85FF; font-weight:700; font-size:clamp(0.72rem, 2.2vw, 0.88rem); }
+.stat-value{ color:var(--hero-text); font-size:clamp(1.1rem, 3.8vw, 1.5rem); font-weight:800; margin-top:4px; }
 
 /* XP */
-.xp-container{ margin-top:18px; }
-.xp-bar{ height:14px; border-radius:10px; background:#141521; overflow:hidden; border:1px solid rgba(255,255,255,0.04); }
+.xp-container{ margin-top:16px; }
+.xp-bar{ height:12px; border-radius:10px; background:#141521; overflow:hidden; border:1px solid rgba(255,255,255,0.04); }
 .xp-fill{ height:100%; width:0%; border-radius:10px; background: linear-gradient(90deg,var(--accent-start),var(--accent-end)); transition: width 900ms cubic-bezier(.2,.9,.2,1); }
-.xp-meta{ display:flex; justify-content:space-between; margin-top:10px; color:var(--muted); font-size:0.95rem; }
+.xp-meta{ display:flex; justify-content:space-between; margin-top:8px; color:var(--muted); font-size:0.9rem; }
 
 /* heatmap */
 .heatmap-container{ overflow-x:auto; -webkit-overflow-scrolling:touch; padding: 4px 0; }
-.heatmap{ display:grid; grid-template-columns: repeat(14, 18px); gap:8px; justify-content:center; margin-top:14px; margin-bottom:14px; min-width: 380px; }
+.heatmap{ display:grid; grid-template-columns: repeat(14, 18px); gap:8px; justify-content:center; margin-top:12px; margin-bottom:12px; min-width: 380px; }
 .heatbox{ width:18px; height:18px; border-radius:6px; background:#2b2f35; border:1px solid rgba(255,255,255,0.06); transition:background .18s; }
 .h0{ background:#25282c; opacity:0.35; } .h1{ background:#c9d6ff } .h2{ background:#8F85FF } .h3{ background:#6C63FF } .h4{ background:#4533A5; }
 
 /* trophy wall */
-.trophy-wall{ display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-top:14px; }
-.trophy{ padding:12px; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); text-align:center; }
+.trophy-wall{ display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:10px; margin-top:12px; }
+.trophy{ padding:10px; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); text-align:center; }
 
 /* modal */
-.edit-modal{ display:none; position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; }
-.modal-box{ background:#0e1622; padding:22px; width:720px; max-width:96%; border-radius:12px; border:1px solid #222835; color:#fff; box-shadow:0 30px 80px rgba(2,6,23,0.7); }
-@media(max-width:900px){ .modal-box{ width:92%; padding:18px; } }
-.form-control{ background:#0f1720; border:1px solid #2b3440; color:#fff; padding:10px; border-radius:8px; width:100%; box-sizing:border-box; }
+.edit-modal{ display:none; position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.7); backdrop-filter: blur(6px); align-items:center; justify-content:center; }
+.modal-box{ background:#0e1622; padding:22px; width:680px; max-width:94%; border-radius:14px; border:1px solid #283244; color:#fff; box-shadow:0 30px 80px rgba(2,6,23,0.7); max-height: 90vh; overflow-y: auto; }
+@media(max-width:600px){
+  .modal-box{ padding:16px; }
+  .modal-form-grid{ grid-template-columns: 1fr !important; }
+  .modal-form-grid > div { grid-column: 1 / -1 !important; }
+}
+.form-control{ background:#0f1720 !important; border:1px solid #2b3440 !important; color:#fff !important; padding:12px; border-radius:10px; width:100%; font-size:16px !important; }
 
 /* form label */
-.form-label{ color:#d7defb; font-size:1rem; font-weight:700; margin-bottom:8px; display:block; }
+.form-label{ color:#d7defb; font-size:0.92rem; font-weight:700; margin-bottom:6px; display:block; }
 
 /* utilities */
 .flex-between{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
@@ -137,11 +151,11 @@
         <div class="profile-sub">Manage your account, view progress and achievements.</div>
       </div>
 
-      <div style="display:flex; gap:12px; align-items:center;">
-        <a class="btn-pill btn-ghost" href="{% url 'my_quizzes' %}">My Quizzes</a>
-        <a class="btn-pill btn-ghost" href="{% url 'history' %}">History</a>
+      <div class="profile-top-actions">
+        <a class="btn-pill btn-ghost" href="{% url 'my_quizzes' %}"><i class="bi bi-grid-fill"></i> My Quizzes</a>
+        <a class="btn-pill btn-ghost" href="{% url 'history' %}"><i class="bi bi-clock-history"></i> History</a>
         <button class="btn-pill btn-primary" onclick="openEditModal()" aria-label="Edit profile">
-          <i class="bi bi-pencil-square" style="margin-right:8px;"></i> Edit Profile
+          <i class="bi bi-pencil-square"></i> Edit Profile
         </button>
       </div>
     </div>
@@ -167,9 +181,9 @@
 
         <p class="profile-bio">{{ user.profile.bio|default:"Add a short bio about yourself to show on your profile." }}</p>
 
-        <div style="margin-top:14px;">
-          <a href="{% url 'categories' %}" class="small-action">Browse Categories</a>
-          <a href="{% url 'logout' %}" class="small-action">Logout</a>
+        <div style="margin-top:14px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
+          <a href="{% url 'categories' %}" class="small-action"><i class="bi bi-compass"></i> Categories</a>
+          <a href="{% url 'logout' %}" class="small-action"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </div>
       </div>
 
@@ -179,22 +193,22 @@
         <!-- Info -->
         <div class="info-grid" role="region" aria-label="Account information">
           <div class="info-item">
-            <span class="info-label">Username</span>
+            <span class="info-label"><i class="bi bi-person"></i> Username</span>
             <span class="info-value">{{ user.username }}</span>
           </div>
 
           <div class="info-item">
-            <span class="info-label">Email</span>
+            <span class="info-label"><i class="bi bi-envelope"></i> Email</span>
             <span class="info-value">{{ user.email }}</span>
           </div>
 
           <div class="info-item">
-            <span class="info-label">Member Since</span>
-            <span class="info-value">{{ user.date_joined|date:"F j, Y" }}</span>
+            <span class="info-label"><i class="bi bi-calendar-event"></i> Member Since</span>
+            <span class="info-value">{{ user.date_joined|date:"M j, Y" }}</span>
           </div>
 
           <div class="info-item">
-            <span class="info-label">Quizzes Taken</span>
+            <span class="info-label"><i class="bi bi-trophy"></i> Quizzes Taken</span>
             <span class="info-value">{{ total_quizzes|default:0 }}</span>
           </div>
         </div>
@@ -208,12 +222,12 @@
 
           <div class="stat-card">
             <div class="stat-title">Average Score</div>
-            <div class="stat-value">{{ avg_score|default:0 }}%</div>
+            <div class="stat-value">{{ avg_score|default:0|floatformat:1 }}%</div>
           </div>
 
           <div class="stat-card">
             <div class="stat-title">Rank</div>
-            <div class="stat-value">{{ user_rank|default:"-" }}</div>
+            <div class="stat-value">#{{ user_rank|default:"-" }}</div>
           </div>
         </div>
 
@@ -304,7 +318,7 @@
     <form method="POST" enctype="multipart/form-data" id="profileForm">
       {% csrf_token %}
       <input type="hidden" name="form_type" value="profile">
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+      <div class="modal-form-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
         <div>
           <label class="form-label">Username</label>
           {{ u_form.username }}
