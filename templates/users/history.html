@@ -11,29 +11,113 @@
     --muted:#9aa3d1;
     --accent:#46A0FF;
     --glass: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.06);
   }
-  .page-hero{ background: linear-gradient(180deg, rgba(46, 53, 81, 0.9), rgba(16,18,36,0.85)); padding:28px; border-radius:12px; margin-bottom:20px; }
   body{ background: var(--bg); color:#e6eefc; }
-  .filters-bar .form-select, .filters-bar .form-control { background: #0d1326; color: #e6eefc; border: 1px solid rgba(255,255,255,0.06); }
+
+  .page-hero{
+    background: linear-gradient(180deg, rgba(46, 53, 81, 0.9), rgba(16,18,36,0.85));
+    padding: clamp(18px, 4vw, 28px);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .filters-bar .form-select, .filters-bar .form-control {
+    background: #0d1326;
+    color: #e6eefc;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    font-size: 0.95rem;
+  }
   .filters-bar label{ color:var(--muted); }
-  .table-dark thead th{ border-bottom: 2px solid rgba(255,255,255,0.04); }
-  .badge-accent{ background: linear-gradient(90deg,var(--accent), #6ec8ff); color:#051428; font-weight:700; }
-  .table-responsive{ padding:12px; }
-  .card-quiz{ background: linear-gradient(180deg, rgba(20,24,44,0.9), rgba(18,21,38,0.85)); border: 1px solid rgba(255,255,255,0.04); }
+
+  .table-dark thead th{ border-bottom: 2px solid rgba(255,255,255,0.06); font-weight: 700; color: #a4b4e0; }
+  .badge-accent{ background: linear-gradient(90deg,var(--accent), #6ec8ff); color:#051428; font-weight:800; font-size: 0.9rem; padding: 6px 12px; }
+  .card-quiz{ background: linear-gradient(180deg, rgba(20,24,44,0.9), rgba(18,21,38,0.85)); border: 1px solid var(--border); }
   .small-muted{ color:var(--muted); font-size:0.9rem; }
+
+  /* Mobile Quiz Cards */
+  .mobile-cards-list {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .mobile-quiz-card {
+    background: linear-gradient(135deg, rgba(26, 32, 58, 0.95), rgba(18, 22, 42, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mobile-quiz-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-quiz-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #eaf2ff;
+    margin: 0;
+  }
+
+  .mobile-quiz-cat {
+    font-size: 0.85rem;
+    color: #8da2d8;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mobile-meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    color: #c4d0ec;
+  }
+
+  .mobile-actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .mobile-actions-row .btn {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* Responsive toggling */
   @media (max-width: 768px){
-    .desktop-only{ display:none !important; }
-    .mobile-only{ display:block !important; }
-    .table thead{ display:none; }
-    .table tbody tr{ display:block; margin-bottom:14px; border-radius:12px; padding:14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); }
-    .table tbody tr td{ display:flex; justify-content:space-between; align-items:center; padding:6px 0; border: none; }
-    .table tbody tr td::before{ content: attr(data-label); font-weight:700; color:var(--muted); font-size:0.85rem; }
+    .desktop-table-view { display: none !important; }
+    .mobile-cards-list { display: flex !important; }
     .filters-bar > select, .filters-bar > div { width: 100% !important; max-width: 100% !important; }
-    .page-hero { flex-direction: column; align-items: flex-start !important; gap: 10px; }
+    .page-hero { flex-direction: column; align-items: flex-start !important; gap: 8px; }
   }
+
   @media (min-width: 769px){
-    .mobile-only{ display:none !important; }
+    .desktop-table-view { display: block !important; }
+    .mobile-cards-list { display: none !important; }
   }
+
   .pagination { background: rgba(36,41,66,0.6); padding: 10px; border-radius: 8px; flex-wrap: wrap; justify-content: center; }
   .pagination .page-link {
     color: #cfe6ff;
@@ -64,7 +148,7 @@
   </div>
 
   <!-- Filter & Sorting Bar -->
-  <form id="filtersForm" method="get" class="filters-bar d-flex flex-wrap align-items-center gap-2 mb-3">
+  <form id="filtersForm" method="get" class="filters-bar d-flex flex-wrap align-items-center gap-2 mb-4">
     <select class="form-select" id="categoryFilter" name="category" style="width: 170px;" aria-label="Filter by category">
       <option value="">All Categories</option>
       {% for cat in categories %}
@@ -98,10 +182,12 @@
     <input type="hidden" name="page" value="1">
   </form>
 
-  <!-- Completed Quizzes -->
-  <section class="mb-4">
-    <h3 style="color:var(--accent);"><i class="bi bi-trophy-fill"></i> Completed Quizzes</h3>
-    <div class="table-responsive shadow rounded card-quiz">
+  <!-- Completed Quizzes Section -->
+  <section class="mb-5">
+    <h3 style="color:var(--accent);" class="mb-3"><i class="bi bi-trophy-fill"></i> Completed Quizzes</h3>
+
+    <!-- Desktop Table View -->
+    <div class="desktop-table-view table-responsive shadow rounded card-quiz p-3">
       <table class="table table-dark align-middle mb-0" id="completedTable">
         <thead>
           <tr>
@@ -110,20 +196,20 @@
             <th scope="col">Subcategory</th>
             <th scope="col">Score</th>
             <th scope="col">Time Taken</th>
-            <th scope="col" class="desktop-only">Actions</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for attempt in completed_page.object_list %}
           <tr class="quiz-row" data-category="{{ attempt.category|escapejs }}">
-            <td class="date-col">{{ attempt.completed_at|date:"Y-m-d H:i" }}</td>
-            <td class="cat-col">{{ attempt.category }}</td>
-            <td class="subcat-col">{{ attempt.subcategory }}</td>
+            <td class="date-col text-muted">{{ attempt.completed_at|date:"Y-m-d H:i" }}</td>
+            <td class="cat-col"><span class="badge bg-secondary">{{ attempt.category }}</span></td>
+            <td class="subcat-col fw-bold">{{ attempt.subcategory }}</td>
             <td>
               <span class="badge rounded-pill badge-accent">{{ attempt.score_percentage }}%</span>
             </td>
-            <td class="time-col">{{ attempt.time_taken_str }}</td>
-            <td class="desktop-only">
+            <td class="time-col text-muted"><i class="bi bi-clock"></i> {{ attempt.time_taken_str }}</td>
+            <td>
               <a href="{% url 'review_quiz' attempt.id %}" class="btn btn-sm btn-outline-info me-1">
                 <i class="bi bi-eye"></i> Review
               </a>
@@ -134,15 +220,46 @@
           </tr>
           {% empty %}
           <tr id="noCompleted">
-            <td colspan="5" class="text-muted text-center">No completed quizzes yet.</td>
+            <td colspan="6" class="text-muted text-center py-4">No completed quizzes found.</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
+    <!-- Mobile Card View -->
+    <div class="mobile-cards-list">
+      {% for attempt in completed_page.object_list %}
+      <div class="mobile-quiz-card">
+        <div class="mobile-quiz-card-header">
+          <div>
+            <h4 class="mobile-quiz-title">{{ attempt.subcategory }}</h4>
+            <div class="mobile-quiz-cat"><i class="bi bi-tag-fill"></i> {{ attempt.category }}</div>
+          </div>
+          <span class="badge rounded-pill badge-accent">{{ attempt.score_percentage }}%</span>
+        </div>
+
+        <div class="mobile-meta-row">
+          <div><i class="bi bi-calendar3"></i> {{ attempt.completed_at|date:"M d, Y H:i" }}</div>
+          <div><i class="bi bi-stopwatch"></i> {{ attempt.time_taken_str }}</div>
+        </div>
+
+        <div class="mobile-actions-row">
+          <a href="{% url 'review_quiz' attempt.id %}" class="btn btn-outline-info">
+            <i class="bi bi-eye-fill"></i> Review
+          </a>
+          <a href="{% url 'retake_quiz' attempt.id %}" class="btn btn-outline-warning">
+            <i class="bi bi-arrow-repeat"></i> Retake
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center text-muted py-4">No completed quizzes found.</div>
+      {% endfor %}
+    </div>
+
     <!-- Pagination -->
-    <nav aria-label="Page navigation" class="mt-3">
+    <nav aria-label="Page navigation" class="mt-4">
       <ul class="pagination justify-content-center">
         {% if completed_page.has_previous %}
           <li class="page-item">
@@ -161,10 +278,12 @@
     </nav>
   </section>
 
-  <!-- Ongoing Quizzes -->
-  <section>
-    <h3 style="color:var(--accent);"><i class="bi bi-hourglass-split"></i> Ongoing Quizzes</h3>
-    <div class="table-responsive shadow rounded card-quiz">
+  <!-- Ongoing Quizzes Section -->
+  <section class="mb-5">
+    <h3 style="color:var(--accent);" class="mb-3"><i class="bi bi-hourglass-split"></i> Ongoing Quizzes</h3>
+
+    <!-- Desktop View -->
+    <div class="desktop-table-view table-responsive shadow rounded card-quiz p-3">
       <table class="table table-dark align-middle mb-0" id="ongoingTable">
         <thead>
           <tr>
@@ -172,27 +291,56 @@
             <th>Category</th>
             <th>Subcategory</th>
             <th>Status</th>
-            <th class="desktop-only">Actions</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for attempt in ongoing_quizzes %}
           <tr class="quiz-row" data-category="{{ attempt.category|escapejs }}">
-            <td>{{ attempt.started_at|date:"Y-m-d H:i" }}</td>
-            <td>{{ attempt.category }}</td>
-            <td>{{ attempt.subcategory }}</td>
-            <td><span class="badge rounded-pill bg-warning text-dark">In Progress</span></td>
-            <td class="desktop-only">
-              <a href="{% url 'continue_quiz' attempt.id %}" class="btn btn-sm btn-success"><i class="bi bi-play-circle"></i> Continue</a>
+            <td class="text-muted">{{ attempt.started_at|date:"Y-m-d H:i" }}</td>
+            <td><span class="badge bg-secondary">{{ attempt.category }}</span></td>
+            <td class="fw-bold">{{ attempt.subcategory }}</td>
+            <td><span class="badge rounded-pill bg-warning text-dark"><i class="bi bi-hourglass-split"></i> In Progress</span></td>
+            <td>
+              <a href="{% url 'continue_quiz' attempt.id %}" class="btn btn-sm btn-success">
+                <i class="bi bi-play-circle"></i> Continue Quiz
+              </a>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="4" class="text-muted text-center">No ongoing quizzes.</td>
+            <td colspan="5" class="text-muted text-center py-3">No ongoing quizzes in progress.</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+    </div>
+
+    <!-- Mobile View for Ongoing -->
+    <div class="mobile-cards-list">
+      {% for attempt in ongoing_quizzes %}
+      <div class="mobile-quiz-card" style="border-left: 4px solid #ffc107;">
+        <div class="mobile-quiz-card-header">
+          <div>
+            <h4 class="mobile-quiz-title">{{ attempt.subcategory }}</h4>
+            <div class="mobile-quiz-cat"><i class="bi bi-tag-fill"></i> {{ attempt.category }}</div>
+          </div>
+          <span class="badge rounded-pill bg-warning text-dark">In Progress</span>
+        </div>
+
+        <div class="mobile-meta-row">
+          <div><i class="bi bi-clock-history"></i> Started: {{ attempt.started_at|date:"M d, H:i" }}</div>
+        </div>
+
+        <div class="mobile-actions-row">
+          <a href="{% url 'continue_quiz' attempt.id %}" class="btn btn-success">
+            <i class="bi bi-play-circle-fill"></i> Continue Quiz
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center text-muted py-3">No ongoing quizzes in progress.</div>
+      {% endfor %}
     </div>
   </section>
 </div>
