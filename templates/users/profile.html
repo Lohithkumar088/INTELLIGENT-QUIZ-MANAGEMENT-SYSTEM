@@ -91,10 +91,10 @@
 .info-value{ color:var(--hero-text); font-weight:800; margin-top:6px; }
 
 /* stats */
-.stats-grid{ display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-start; margin-top:6px; }
-.stat-card{ min-width:150px; padding:14px 18px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01); text-align:center; box-shadow:0 12px 28px rgba(2,4,16,0.45); }
-.stat-title{ color:#8F85FF; font-weight:700; font-size:0.95rem; }
-.stat-value{ color:var(--hero-text); font-size:1.6rem; font-weight:800; margin-top:8px; }
+.stats-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-top:6px; }
+.stat-card{ padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.03); background: rgba(255,255,255,0.01); text-align:center; box-shadow:0 12px 28px rgba(2,4,16,0.45); }
+.stat-title{ color:#8F85FF; font-weight:700; font-size:0.9rem; }
+.stat-value{ color:var(--hero-text); font-size:clamp(1.3rem, 4vw, 1.6rem); font-weight:800; margin-top:6px; }
 
 /* XP */
 .xp-container{ margin-top:18px; }
@@ -103,13 +103,14 @@
 .xp-meta{ display:flex; justify-content:space-between; margin-top:10px; color:var(--muted); font-size:0.95rem; }
 
 /* heatmap */
-.heatmap{ display:grid; grid-template-columns: repeat(14, 18px); gap:8px; justify-content:center; margin-top:14px; margin-bottom:14px; }
+.heatmap-container{ overflow-x:auto; -webkit-overflow-scrolling:touch; padding: 4px 0; }
+.heatmap{ display:grid; grid-template-columns: repeat(14, 18px); gap:8px; justify-content:center; margin-top:14px; margin-bottom:14px; min-width: 380px; }
 .heatbox{ width:18px; height:18px; border-radius:6px; background:#2b2f35; border:1px solid rgba(255,255,255,0.06); transition:background .18s; }
 .h0{ background:#25282c; opacity:0.35; } .h1{ background:#c9d6ff } .h2{ background:#8F85FF } .h3{ background:#6C63FF } .h4{ background:#4533A5; }
 
 /* trophy wall */
-.trophy-wall{ display:flex; gap:14px; margin-top:14px; flex-wrap:wrap; justify-content:flex-start; }
-.trophy{ padding:12px; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); min-width:120px; text-align:center; }
+.trophy-wall{ display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap:12px; margin-top:14px; }
+.trophy{ padding:12px; border-radius:12px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); text-align:center; }
 
 /* modal */
 .edit-modal{ display:none; position:fixed; inset:0; z-index:3000; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; }
@@ -243,20 +244,22 @@
             <div style="font-size:0.9rem; color:var(--muted);">Active days: {{ heatmap_grid|length }}</div>
           </div>
 
-          <div class="heatmap" id="heatmap" aria-hidden="true">
-            {% for day in heatmap_grid %}
-              {% if day.count == 0 %}
-                <div class="heatbox h0" title="{{ day.date }}: {{ day.count }} activities"></div>
-              {% elif day.count == 1 %}
-                <div class="heatbox h1" title="{{ day.date }}: {{ day.count }} activities"></div>
-              {% elif day.count <= 3 %}
-                <div class="heatbox h2" title="{{ day.date }}: {{ day.count }} activities"></div>
-              {% elif day.count <= 6 %}
-                <div class="heatbox h3" title="{{ day.date }}: {{ day.count }} activities"></div>
-              {% else %}
-                <div class="heatbox h4" title="{{ day.date }}: {{ day.count }} activities"></div>
-              {% endif %}
-            {% endfor %}
+          <div class="heatmap-container">
+            <div class="heatmap" id="heatmap" aria-hidden="true">
+              {% for day in heatmap_grid %}
+                {% if day.count == 0 %}
+                  <div class="heatbox h0" title="{{ day.date }}: {{ day.count }} activities"></div>
+                {% elif day.count == 1 %}
+                  <div class="heatbox h1" title="{{ day.date }}: {{ day.count }} activities"></div>
+                {% elif day.count <= 3 %}
+                  <div class="heatbox h2" title="{{ day.date }}: {{ day.count }} activities"></div>
+                {% elif day.count <= 6 %}
+                  <div class="heatbox h3" title="{{ day.date }}: {{ day.count }} activities"></div>
+                {% else %}
+                  <div class="heatbox h4" title="{{ day.date }}: {{ day.count }} activities"></div>
+                {% endif %}
+              {% endfor %}
+            </div>
           </div>
 
           <div class="trophy-wall" aria-hidden="true">
