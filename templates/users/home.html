@@ -103,39 +103,33 @@ Home | SmartLearn
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  /* hero logo area - improved fitting */
+  /* hero logo area - fully responsive & complete image fitting */
   .hero-logo-box {
-    width: 350px;
-    height: 220px;
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    min-height: 200px;
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.01);
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
     box-shadow:
       0 18px 48px rgba(2, 4, 16, 0.6),
       inset 0 6px 24px rgba(255, 255, 255, 0.01);
-    padding: 18px;
+    padding: 14px;
+    margin: 0 auto;
   }
   .hero-logo {
-    width: 120%; /* zoom slightly */
-    height: 120%; /* zoom slightly */
+    width: 100%;
+    height: auto;
+    max-height: 190px;
     object-fit: contain;
     display: block;
-
-    transform: scale(1.6); /* perfect zoom level */
-    transform-origin: center;
-
-    filter: drop-shadow(0 12px 32px rgba(90, 60, 220, 0.25));
-
-    border-radius: 12px;
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.55),
-      rgba(0, 0, 0, 0.7)
-    );
+    transform: none !important;
+    filter: drop-shadow(0 10px 25px rgba(90, 60, 220, 0.35));
+    border-radius: 10px;
   }
 
   /* CATEGORIES: add perspective so 3D transform feels realistic */
