@@ -648,7 +648,6 @@ def submit_text_feedback_view(request):
 
 
 
-@login_required
 def help_view(request):
     return render(request, 'users/help.html')
 
