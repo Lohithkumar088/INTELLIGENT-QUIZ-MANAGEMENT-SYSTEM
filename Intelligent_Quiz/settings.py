@@ -41,6 +41,9 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1",
     "http://localhost",
+    "http://192.168.1.9:8000",
+    "http://192.168.1.9",
+    "https://*.trycloudflare.com",
     "http://13.201.229.177",
     "https://intelligent-quiz.onrender.com",
 ]
